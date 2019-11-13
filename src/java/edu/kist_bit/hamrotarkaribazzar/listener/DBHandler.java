@@ -20,7 +20,7 @@ public class DBHandler implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("inventory1");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("Hamro_Tarkari_BazzarPU");
         sce.getServletContext().setAttribute("HamroTarikarBazzaremf",emf);
     }
 

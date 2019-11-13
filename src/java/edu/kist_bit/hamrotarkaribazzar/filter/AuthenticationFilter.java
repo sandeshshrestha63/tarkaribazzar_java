@@ -35,12 +35,12 @@ import javax.servlet.http.HttpSession;
  * @author Administrator
  */
 @WebFilter(filterName = "AuthenticationFilter", urlPatterns = {"/*"},
-        initParams = @WebInitParam(name = "avoids-url", value = "/login.html,"
+        initParams = @WebInitParam(name = "avoids-url", value = "/login.jsp,"
                 + "/css/,"
                 + "/js/,"
                 + "/index.jsp"))
 public class AuthenticationFilter implements Filter {
-    
+
     private static final boolean debug = false;
 
     // The filter configuration object we are associated with.  If
@@ -48,62 +48,44 @@ public class AuthenticationFilter implements Filter {
     // configured. 
     private FilterConfig filterConfig = null;
     private ArrayList<String> urlList;
-    
-    public AuthenticationFilter() {
-    }    
-    
 
-  
+    public AuthenticationFilter() {
+    }
+
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
-        
+
         if (debug) {
             log("AuthenticationFilter:doFilter()");
         }
-        
+
         HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;    
+        HttpServletResponse resp = (HttpServletResponse) response;
         String url = req.getServletPath();
         boolean allowedRequest = false;
-        if(urlList.contains(url)){
+        if (urlList.contains(url)) {
             allowedRequest = true;
         }
-        
-        
-        
-        // Create wrappers for the request and response objects.
-        // Using these, you can extend the capabilities of the
-        // request and response, for example, allow setting parameters
-        // on the request before sending the request to the rest of the filter chain,
-        // or keep track of the cookies that are set on the response.
-        //
-        // Caveat: some servers do not handle wrappers very well for forward or
-        // include requests.
-        RequestWrapper wrappedRequest = new RequestWrapper((HttpServletRequest) request);
-        ResponseWrapper wrappedResponse = new ResponseWrapper((HttpServletResponse) response);
-        
-        
+
         Throwable problem = null;
-        
-        try {
-            chain.doFilter(wrappedRequest, wrappedResponse);
-        } catch (Throwable t) {
-            // If an exception is thrown somewhere down the filter chain,
-            // we still want to execute our after processing, and then
-            // rethrow the problem after that.
-            problem = t;
-            t.printStackTrace();
-        }
-        
-        if(!allowedRequest){
+
+        if (!allowedRequest) {
             HttpSession session = req.getSession(false);
-            if(null == session && url.equalsIgnoreCase("/dashboard")){
-                if(req.getMethod().equalsIgnoreCase("POST")){
-                    
+            if (null == session && url.equalsIgnoreCase("/dashboard")) {
+                if (req.getMethod().equalsIgnoreCase("POST")) {
+
+                } else {
+                    resp.sendRedirect("login.jsp");
+                    return;
                 }
+            } else if (null == session) {
+                resp.sendRedirect("index.jsp");
+                return;
             }
         }
+
+        chain.doFilter(request, response);
         // If there was a problem, we want to rethrow it if it is
         // a known type, otherwise log it.
         if (problem != null) {
@@ -136,22 +118,22 @@ public class AuthenticationFilter implements Filter {
     /**
      * Destroy method for this filter
      */
-    public void destroy() {        
+    public void destroy() {
     }
 
     /**
      * Init method for this filter
      */
-    public void init(FilterConfig filterConfig) {        
+    public void init(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
-        String urls = filterConfig.getInitParameter("avoids-uel");
-        StringTokenizer token = new StringTokenizer(urls,",");
+        String urls = filterConfig.getInitParameter("avoids-url");
+        StringTokenizer token = new StringTokenizer(urls, ",");
         urlList = new ArrayList<>();
-        while(token.hasMoreTokens()){
+        while (token.hasMoreTokens()) {
             urlList.add(token.nextToken());
         }
         if (filterConfig != null) {
-            if (debug) {                
+            if (debug) {
                 log("AuthenticationFilter: Initializing filter");
             }
         }
@@ -169,22 +151,22 @@ public class AuthenticationFilter implements Filter {
         sb.append(filterConfig);
         sb.append(")");
         return (sb.toString());
-        
+
     }
-    
+
     private void sendProcessingError(Throwable t, ServletResponse response) {
-        String stackTrace = getStackTrace(t);        
-        
+        String stackTrace = getStackTrace(t);
+
         if (stackTrace != null && !stackTrace.equals("")) {
             try {
                 response.setContentType("text/html");
                 PrintStream ps = new PrintStream(response.getOutputStream());
-                PrintWriter pw = new PrintWriter(ps);                
+                PrintWriter pw = new PrintWriter(ps);
                 pw.print("<html>\n<head>\n<title>Error</title>\n</head>\n<body>\n"); //NOI18N
 
                 // PENDING! Localize this for next official release
-                pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n");                
-                pw.print(stackTrace);                
+                pw.print("<h1>The resource did not process correctly</h1>\n<pre>\n");
+                pw.print(stackTrace);
                 pw.print("</pre></body>\n</html>"); //NOI18N
                 pw.close();
                 ps.close();
@@ -201,7 +183,7 @@ public class AuthenticationFilter implements Filter {
             }
         }
     }
-    
+
     public static String getStackTrace(Throwable t) {
         String stackTrace = null;
         try {
@@ -215,9 +197,9 @@ public class AuthenticationFilter implements Filter {
         }
         return stackTrace;
     }
-    
+
     public void log(String msg) {
-        filterConfig.getServletContext().log(msg);        
+        filterConfig.getServletContext().log(msg);
     }
 
     /**
@@ -228,7 +210,7 @@ public class AuthenticationFilter implements Filter {
      * access to the wrapped request using the method getRequest()
      */
     class RequestWrapper extends HttpServletRequestWrapper {
-        
+
         public RequestWrapper(HttpServletRequest request) {
             super(request);
         }
@@ -237,12 +219,12 @@ public class AuthenticationFilter implements Filter {
         // you must also override the getParameter, getParameterValues, getParameterMap,
         // and getParameterNames methods.
         protected Hashtable localParams = null;
-        
+
         public void setParameter(String name, String[] values) {
             if (debug) {
                 System.out.println("AuthenticationFilter::setParameter(" + name + "=" + values + ")" + " localParams = " + localParams);
             }
-            
+
             if (localParams == null) {
                 localParams = new Hashtable();
                 // Copy the parameters from the underlying request.
@@ -256,7 +238,7 @@ public class AuthenticationFilter implements Filter {
             }
             localParams.put(name, values);
         }
-        
+
         @Override
         public String getParameter(String name) {
             if (debug) {
@@ -275,7 +257,7 @@ public class AuthenticationFilter implements Filter {
             }
             return (val == null ? null : val.toString());
         }
-        
+
         @Override
         public String[] getParameterValues(String name) {
             if (debug) {
@@ -286,7 +268,7 @@ public class AuthenticationFilter implements Filter {
             }
             return (String[]) localParams.get(name);
         }
-        
+
         @Override
         public Enumeration getParameterNames() {
             if (debug) {
@@ -296,8 +278,8 @@ public class AuthenticationFilter implements Filter {
                 return getRequest().getParameterNames();
             }
             return localParams.keys();
-        }        
-        
+        }
+
         @Override
         public Map getParameterMap() {
             if (debug) {
@@ -318,9 +300,9 @@ public class AuthenticationFilter implements Filter {
      * get access to the wrapped response using the method getResponse()
      */
     class ResponseWrapper extends HttpServletResponseWrapper {
-        
+
         public ResponseWrapper(HttpServletResponse response) {
-            super(response);            
+            super(response);
         }
 
         // You might, for example, wish to know what cookies were set on the response
@@ -347,5 +329,5 @@ public class AuthenticationFilter implements Filter {
 	}
          */
     }
-    
+
 }
