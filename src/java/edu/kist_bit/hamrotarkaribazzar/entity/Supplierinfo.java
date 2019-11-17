@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Administrator
  */
 @Entity
-@Table(name = "supplierinfo", catalog = "inventory1", schema = "")
+@Table(name = "supplierinfo", catalog = "tarkaribazzar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Supplierinfo.findAll", query = "SELECT s FROM Supplierinfo s")
@@ -33,8 +33,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Supplierinfo.findByName", query = "SELECT s FROM Supplierinfo s WHERE s.name = :name")
     , @NamedQuery(name = "Supplierinfo.findByAddress", query = "SELECT s FROM Supplierinfo s WHERE s.address = :address")
     , @NamedQuery(name = "Supplierinfo.findByContact", query = "SELECT s FROM Supplierinfo s WHERE s.contact = :contact")
-    , @NamedQuery(name = "Supplierinfo.findByEmail", query = "SELECT s FROM Supplierinfo s WHERE s.email = :email")
-    , @NamedQuery(name = "Supplierinfo.findByPanNo", query = "SELECT s FROM Supplierinfo s WHERE s.panNo = :panNo")})
+    , @NamedQuery(name = "Supplierinfo.findByEmail", query = "SELECT s FROM Supplierinfo s WHERE s.email = :email")})
 public class Supplierinfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,9 +50,7 @@ public class Supplierinfo implements Serializable {
     private String contact;
     @Column(name = "email")
     private String email;
-    @Column(name = "pan_no")
-    private Integer panNo;
-    @OneToMany(mappedBy = "departId")
+    @OneToMany(mappedBy = "suppId")
     private List<Productdetail> productdetailList;
 
     public Supplierinfo() {
@@ -101,14 +98,6 @@ public class Supplierinfo implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Integer getPanNo() {
-        return panNo;
-    }
-
-    public void setPanNo(Integer panNo) {
-        this.panNo = panNo;
     }
 
     @XmlTransient

@@ -23,15 +23,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Administrator
  */
 @Entity
-@Table(name = "users", catalog = "inventory1", schema = "")
+@Table(name = "users", catalog = "tarkaribazzar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")
     , @NamedQuery(name = "Users.findById", query = "SELECT u FROM Users u WHERE u.id = :id")
     , @NamedQuery(name = "Users.findByFname", query = "SELECT u FROM Users u WHERE u.fname = :fname")
     , @NamedQuery(name = "Users.findByLname", query = "SELECT u FROM Users u WHERE u.lname = :lname")
+    , @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email")
     , @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username")
-    , @NamedQuery(name = "Users.findByPasswd", query = "SELECT u FROM Users u WHERE u.passwd = :passwd")
+    , @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")
+    , @NamedQuery(name = "Users.findByType", query = "SELECT u FROM Users u WHERE u.type = :type")
     , @NamedQuery(name = "Users.findByImage", query = "SELECT u FROM Users u WHERE u.image = :image")
     , @NamedQuery(name = "Users.findByContact", query = "SELECT u FROM Users u WHERE u.contact = :contact")
     , @NamedQuery(name = "Users.findByAddress", query = "SELECT u FROM Users u WHERE u.address = :address")
@@ -49,10 +51,14 @@ public class Users implements Serializable {
     private String fname;
     @Column(name = "lname")
     private String lname;
+    @Column(name = "email")
+    private String email;
     @Column(name = "username")
     private String username;
-    @Column(name = "passwd")
-    private String passwd;
+    @Column(name = "password")
+    private String password;
+    @Column(name = "type")
+    private String type;
     @Column(name = "image")
     private String image;
     @Column(name = "contact")
@@ -95,6 +101,14 @@ public class Users implements Serializable {
         this.lname = lname;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -103,12 +117,20 @@ public class Users implements Serializable {
         this.username = username;
     }
 
-    public String getPasswd() {
-        return passwd;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswd(String passwd) {
-        this.passwd = passwd;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getImage() {

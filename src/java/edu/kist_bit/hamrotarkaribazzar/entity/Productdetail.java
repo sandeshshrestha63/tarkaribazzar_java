@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Administrator
  */
 @Entity
-@Table(name = "productdetail", catalog = "inventory1", schema = "")
+@Table(name = "productdetail", catalog = "tarkaribazzar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Productdetail.findAll", query = "SELECT p FROM Productdetail p")
@@ -69,10 +69,7 @@ public class Productdetail implements Serializable {
     private ConsumableItems consId;
     @JoinColumn(name = "supp_id", referencedColumnName = "id")
     @ManyToOne
-    private Departmentinfo suppId;
-    @JoinColumn(name = "depart_id", referencedColumnName = "id")
-    @ManyToOne
-    private Supplierinfo departId;
+    private Supplierinfo suppId;
 
     public Productdetail() {
     }
@@ -154,20 +151,12 @@ public class Productdetail implements Serializable {
         this.consId = consId;
     }
 
-    public Departmentinfo getSuppId() {
+    public Supplierinfo getSuppId() {
         return suppId;
     }
 
-    public void setSuppId(Departmentinfo suppId) {
+    public void setSuppId(Supplierinfo suppId) {
         this.suppId = suppId;
-    }
-
-    public Supplierinfo getDepartId() {
-        return departId;
-    }
-
-    public void setDepartId(Supplierinfo departId) {
-        this.departId = departId;
     }
 
     @Override

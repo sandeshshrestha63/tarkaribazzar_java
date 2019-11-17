@@ -5,6 +5,10 @@
  */
 package edu.kist_bit.hamrotarkaribazzar.filter;
 
+import edu.kist_bit.hamrotarkaribazzar.entity.Users;
+import edu.kist_bit.hamrotarkaribazzar.services.UsersJpaController;
+import edu.kist_bit.hamrotarkaribazzar.services.exceptions.NonexistentEntityException;
+import edu.kist_bit.hamrotarkaribazzar.utils.BCrypt;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -16,6 +20,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -36,8 +43,10 @@ import javax.servlet.http.HttpSession;
  */
 @WebFilter(filterName = "AuthenticationFilter", urlPatterns = {"/*"},
         initParams = @WebInitParam(name = "avoids-url", value = "/login.jsp,"
-                + "/css/,"
-                + "/js/,"
+                + ".css,"
+                + ".js,"
+                + "/fonts/,"
+                + "/images/,"
                 + "/index.jsp"))
 public class AuthenticationFilter implements Filter {
 
@@ -64,22 +73,35 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         String url = req.getServletPath();
         boolean allowedRequest = false;
-        if (urlList.contains(url)) {
-            allowedRequest = true;
+        
+        for(String s: urlList){
+            if(url.contains(s)){
+                allowedRequest = true;
+                break;
+            }
         }
-
         Throwable problem = null;
 
         if (!allowedRequest) {
             HttpSession session = req.getSession(false);
-            if (null == session && url.equalsIgnoreCase("/dashboard")) {
+            if ((null == session || session.getAttribute("loggedInUser") == null) && url.equalsIgnoreCase("/dashboard")) {
                 if (req.getMethod().equalsIgnoreCase("POST")) {
-
+                    try {
+                        if(checkLogin(req, resp)){
+                            chain.doFilter(request, response);
+                            return;
+                        }else{
+                            resp.sendRedirect("login.jsp");
+                            return;
+                        }
+                    } catch (NonexistentEntityException ex) {
+                        Logger.getLogger(AuthenticationFilter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else {
                     resp.sendRedirect("login.jsp");
                     return;
                 }
-            } else if (null == session) {
+            } else if (null == session || session.getAttribute("loggedInUser") == null) {
                 resp.sendRedirect("index.jsp");
                 return;
             }
@@ -200,6 +222,27 @@ public class AuthenticationFilter implements Filter {
 
     public void log(String msg) {
         filterConfig.getServletContext().log(msg);
+    }
+
+    private boolean checkLogin(HttpServletRequest req, HttpServletResponse resp)throws IOException,ServletException, NonexistentEntityException {
+        EntityManagerFactory emf = (EntityManagerFactory) req.getServletContext().getAttribute("HamroTarikarBazzaremf");
+        boolean isUserLoggedIn = false;
+        Users user = null;
+        UsersJpaController userJpaController = new UsersJpaController(emf);
+        try {
+            user = userJpaController.checkLogin(req.getParameter("email"));
+        } catch (NonexistentEntityException ex) {
+            Logger.getLogger(AuthenticationFilter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         if(user != null){
+            //if(BCrypt.checkpw(req.getParameter("password"),user.getPassword())){
+            if(req.getParameter("password").equals(user.getPassword())){
+                isUserLoggedIn = true;
+                HttpSession session = req.getSession();
+                session.setAttribute("loggedInUser", user);
+            }
+        }
+        return isUserLoggedIn;
     }
 
     /**

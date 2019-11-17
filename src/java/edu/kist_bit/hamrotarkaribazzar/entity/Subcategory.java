@@ -27,12 +27,13 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Administrator
  */
 @Entity
-@Table(name = "subcategory", catalog = "inventory1", schema = "")
+@Table(name = "subcategory", catalog = "tarkaribazzar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Subcategory.findAll", query = "SELECT s FROM Subcategory s")
     , @NamedQuery(name = "Subcategory.findById", query = "SELECT s FROM Subcategory s WHERE s.id = :id")
-    , @NamedQuery(name = "Subcategory.findByName", query = "SELECT s FROM Subcategory s WHERE s.name = :name")})
+    , @NamedQuery(name = "Subcategory.findByName", query = "SELECT s FROM Subcategory s WHERE s.name = :name")
+    , @NamedQuery(name = "Subcategory.findByRemark", query = "SELECT s FROM Subcategory s WHERE s.remark = :remark")})
 public class Subcategory implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,6 +44,8 @@ public class Subcategory implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
+    @Column(name = "remark")
+    private String remark;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @ManyToOne
     private Category categoryId;
@@ -70,6 +73,14 @@ public class Subcategory implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public Category getCategoryId() {
