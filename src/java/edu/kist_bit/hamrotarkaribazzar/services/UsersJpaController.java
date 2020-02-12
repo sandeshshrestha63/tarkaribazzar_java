@@ -5,16 +5,19 @@
  */
 package edu.kist_bit.hamrotarkaribazzar.services;
 
-import edu.kist_bit.hamrotarkaribazzar.entity.Users;
-import edu.kist_bit.hamrotarkaribazzar.services.exceptions.NonexistentEntityException;
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import edu.kist_bit.hamrotarkaribazzar.entity.Orders;
+import edu.kist_bit.hamrotarkaribazzar.entity.Users;
+import edu.kist_bit.hamrotarkaribazzar.services.exceptions.NonexistentEntityException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -32,11 +35,29 @@ public class UsersJpaController implements Serializable {
     }
 
     public void create(Users users) {
+        if (users.getOrdersList() == null) {
+            users.setOrdersList(new ArrayList<Orders>());
+        }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            List<Orders> attachedOrdersList = new ArrayList<Orders>();
+            for (Orders ordersListOrdersToAttach : users.getOrdersList()) {
+                ordersListOrdersToAttach = em.getReference(ordersListOrdersToAttach.getClass(), ordersListOrdersToAttach.getId());
+                attachedOrdersList.add(ordersListOrdersToAttach);
+            }
+            users.setOrdersList(attachedOrdersList);
             em.persist(users);
+            for (Orders ordersListOrders : users.getOrdersList()) {
+                Users oldUserIdOfOrdersListOrders = ordersListOrders.getUserId();
+                ordersListOrders.setUserId(users);
+                ordersListOrders = em.merge(ordersListOrders);
+                if (oldUserIdOfOrdersListOrders != null) {
+                    oldUserIdOfOrdersListOrders.getOrdersList().remove(ordersListOrders);
+                    oldUserIdOfOrdersListOrders = em.merge(oldUserIdOfOrdersListOrders);
+                }
+            }
             em.getTransaction().commit();
         } finally {
             if (em != null) {
@@ -50,7 +71,34 @@ public class UsersJpaController implements Serializable {
         try {
             em = getEntityManager();
             em.getTransaction().begin();
+            Users persistentUsers = em.find(Users.class, users.getId());
+            List<Orders> ordersListOld = persistentUsers.getOrdersList();
+            List<Orders> ordersListNew = users.getOrdersList();
+            List<Orders> attachedOrdersListNew = new ArrayList<Orders>();
+            for (Orders ordersListNewOrdersToAttach : ordersListNew) {
+                ordersListNewOrdersToAttach = em.getReference(ordersListNewOrdersToAttach.getClass(), ordersListNewOrdersToAttach.getId());
+                attachedOrdersListNew.add(ordersListNewOrdersToAttach);
+            }
+            ordersListNew = attachedOrdersListNew;
+            users.setOrdersList(ordersListNew);
             users = em.merge(users);
+            for (Orders ordersListOldOrders : ordersListOld) {
+                if (!ordersListNew.contains(ordersListOldOrders)) {
+                    ordersListOldOrders.setUserId(null);
+                    ordersListOldOrders = em.merge(ordersListOldOrders);
+                }
+            }
+            for (Orders ordersListNewOrders : ordersListNew) {
+                if (!ordersListOld.contains(ordersListNewOrders)) {
+                    Users oldUserIdOfOrdersListNewOrders = ordersListNewOrders.getUserId();
+                    ordersListNewOrders.setUserId(users);
+                    ordersListNewOrders = em.merge(ordersListNewOrders);
+                    if (oldUserIdOfOrdersListNewOrders != null && !oldUserIdOfOrdersListNewOrders.equals(users)) {
+                        oldUserIdOfOrdersListNewOrders.getOrdersList().remove(ordersListNewOrders);
+                        oldUserIdOfOrdersListNewOrders = em.merge(oldUserIdOfOrdersListNewOrders);
+                    }
+                }
+            }
             em.getTransaction().commit();
         } catch (Exception ex) {
             String msg = ex.getLocalizedMessage();
@@ -79,6 +127,11 @@ public class UsersJpaController implements Serializable {
                 users.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The users with id " + id + " no longer exists.", enfe);
+            }
+            List<Orders> ordersList = users.getOrdersList();
+            for (Orders ordersListOrders : ordersList) {
+                ordersListOrders.setUserId(null);
+                ordersListOrders = em.merge(ordersListOrders);
             }
             em.remove(users);
             em.getTransaction().commit();
@@ -135,13 +188,13 @@ public class UsersJpaController implements Serializable {
         }
     }
     
-    public Users checkLogin(String email) throws NonexistentEntityException{
+    public Users checkLogin(String username) throws NonexistentEntityException{
         EntityManager em = getEntityManager();
         Users results = null;
         try{
-            results = (Users) em.createNamedQuery("Users.findByEmail").setParameter("email", email).getSingleResult();
-        }catch(NullPointerException e){
-            throw new NonexistentEntityException("the users with email"+email+"no longer eixst");
+            results = (Users) em.createNamedQuery("Users.findByUsername").setParameter("username", username).getSingleResult();
+        }catch(NullPointerException | NoResultException e){
+            throw new NonexistentEntityException("the users with username"+username+"no longer eixst");
         }
              
         return results;

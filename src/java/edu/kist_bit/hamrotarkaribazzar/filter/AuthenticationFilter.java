@@ -42,12 +42,14 @@ import javax.servlet.http.HttpSession;
  * @author Administrator
  */
 @WebFilter(filterName = "AuthenticationFilter", urlPatterns = {"/*"},
-        initParams = @WebInitParam(name = "avoids-url", value = "/login.jsp,"
-                + ".css,"
-                + ".js,"
-                + "/fonts/,"
-                + "/images/,"
-                + "/index.jsp"))
+    initParams = @WebInitParam(name = "avoids-url", value = "/login.jsp,"
+        + ".css,"
+        + ".js,"
+        + "/font/,"
+        + "/images/,"
+        + "/index.jsp,"
+        + "/signup,"
+        + "/register"))
 public class AuthenticationFilter implements Filter {
 
     private static final boolean debug = false;
@@ -88,10 +90,19 @@ public class AuthenticationFilter implements Filter {
                 if (req.getMethod().equalsIgnoreCase("POST")) {
                     try {
                         if(checkLogin(req, resp)){
-                            chain.doFilter(request, response);
-                            return;
+                            HttpSession currentSession =req.getSession(false);
+                            Users u = (Users) currentSession.getAttribute("loggedInUser");
+                            if(u.getRole().equalsIgnoreCase("admin")){
+                                req.getRequestDispatcher("/WEB-INF/admin/admindashboard.jsp").forward(request,response);
+                                return;
+                            }else{
+                                chain.doFilter(request, response);
+                                return;
+                            }
                         }else{
-                            resp.sendRedirect("login.jsp");
+                            req.setAttribute("errorMsg", "Invalid Username and Password");
+                            req.getRequestDispatcher("login.jsp").forward(request, response);
+                            //resp.sendRedirect("login.jsp");
                             return;
                         }
                     } catch (NonexistentEntityException ex) {
@@ -104,6 +115,13 @@ public class AuthenticationFilter implements Filter {
             } else if (null == session || session.getAttribute("loggedInUser") == null) {
                 resp.sendRedirect("index.jsp");
                 return;
+            }else{
+                HttpSession currentSession = req.getSession(false);
+                Users u = (Users) currentSession.getAttribute("loggedInUser");
+                if (u.getRole().equalsIgnoreCase("admin") && url.equalsIgnoreCase("/dashboard")) {
+                    req.getRequestDispatcher("/WEB-INF/admin/admindashboard.jsp").forward(request, response);
+                    return;
+                }
             }
         }
 
@@ -230,7 +248,7 @@ public class AuthenticationFilter implements Filter {
         Users user = null;
         UsersJpaController userJpaController = new UsersJpaController(emf);
         try {
-            user = userJpaController.checkLogin(req.getParameter("email"));
+            user = userJpaController.checkLogin(req.getParameter("username"));
         } catch (NonexistentEntityException ex) {
             Logger.getLogger(AuthenticationFilter.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -2,22 +2,18 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="Hamro_Tarkari_BazzarPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Enquiry</class>
     <class>edu.kist_bit.hamrotarkaribazzar.entity.Users</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Subcategory</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Customers</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Departmentinfo</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Productdetail</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Supplierinfo</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.ConsumableItems</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Fruits</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Dairy</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Suppliers</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Meat</class>
-    <class>edu.kist_bit.hamrotarkaribazzar.entity.Vegetables</class>
     <class>edu.kist_bit.hamrotarkaribazzar.entity.Category</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Product</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Stock</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Orders</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Vendor</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.Orderitems</class>
+    <class>edu.kist_bit.hamrotarkaribazzar.entity.DeliveryAddress</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/inventory1?zeroDateTimeBehavior=convertToNull"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/tarkaribazaar?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.password" value=""/>

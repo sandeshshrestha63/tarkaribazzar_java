@@ -25,14 +25,13 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Administrator
  */
 @Entity
-@Table(name = "category", catalog = "tarkaribazzar", schema = "")
+@Table(name = "category", catalog = "tarkaribazaar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c")
     , @NamedQuery(name = "Category.findById", query = "SELECT c FROM Category c WHERE c.id = :id")
-    , @NamedQuery(name = "Category.findByCode", query = "SELECT c FROM Category c WHERE c.code = :code")
-    , @NamedQuery(name = "Category.findByName", query = "SELECT c FROM Category c WHERE c.name = :name")
-    , @NamedQuery(name = "Category.findByRemark", query = "SELECT c FROM Category c WHERE c.remark = :remark")})
+    , @NamedQuery(name = "Category.findByCatName", query = "SELECT c FROM Category c WHERE c.catName = :catName")
+    , @NamedQuery(name = "Category.findByImage", query = "SELECT c FROM Category c WHERE c.image = :image")})
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,22 +40,24 @@ public class Category implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "code")
-    private String code;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "remark")
-    private String remark;
+    @Basic(optional = false)
+    @Column(name = "cat_name")
+    private String catName;
+    @Column(name = "image")
+    private String image;
     @OneToMany(mappedBy = "categoryId")
-    private List<Subcategory> subcategoryList;
-    @OneToMany(mappedBy = "catgId")
-    private List<ConsumableItems> consumableItemsList;
+    private List<Product> productList;
 
     public Category() {
     }
 
     public Category(Integer id) {
         this.id = id;
+    }
+
+    public Category(Integer id, String catName) {
+        this.id = id;
+        this.catName = catName;
     }
 
     public Integer getId() {
@@ -67,46 +68,29 @@ public class Category implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
+    public String getCatName() {
+        return catName;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setCatName(String catName) {
+        this.catName = catName;
     }
 
-    public String getName() {
-        return name;
+    public String getImage() {
+        return image;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @XmlTransient
-    public List<Subcategory> getSubcategoryList() {
-        return subcategoryList;
+    public List<Product> getProductList() {
+        return productList;
     }
 
-    public void setSubcategoryList(List<Subcategory> subcategoryList) {
-        this.subcategoryList = subcategoryList;
-    }
-
-    @XmlTransient
-    public List<ConsumableItems> getConsumableItemsList() {
-        return consumableItemsList;
-    }
-
-    public void setConsumableItemsList(List<ConsumableItems> consumableItemsList) {
-        this.consumableItemsList = consumableItemsList;
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 
     @Override

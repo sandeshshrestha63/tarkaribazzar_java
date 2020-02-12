@@ -1,5 +1,8 @@
 package edu.kist_bit.hamrotarkaribazzar.utils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,6 +15,7 @@ package edu.kist_bit.hamrotarkaribazzar.utils;
  * @author leapfrog
  */
 public class FileUploadDTO {
+    
     private String fileLocation;
     private Boolean isWrittenOnDisk;
 
@@ -31,5 +35,5 @@ public class FileUploadDTO {
         this.isWrittenOnDisk = isWrittenOnDisk;
     }
     
-    
+  
 }

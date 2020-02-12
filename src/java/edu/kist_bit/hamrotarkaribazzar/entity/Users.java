@@ -6,7 +6,7 @@
 package edu.kist_bit.hamrotarkaribazzar.entity;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,30 +15,35 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Administrator
  */
 @Entity
-@Table(name = "users", catalog = "tarkaribazzar", schema = "")
+@Table(name = "users", catalog = "tarkaribazaar", schema = "")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")
     , @NamedQuery(name = "Users.findById", query = "SELECT u FROM Users u WHERE u.id = :id")
     , @NamedQuery(name = "Users.findByFname", query = "SELECT u FROM Users u WHERE u.fname = :fname")
     , @NamedQuery(name = "Users.findByLname", query = "SELECT u FROM Users u WHERE u.lname = :lname")
+    , @NamedQuery(name = "Users.findByAddress", query = "SELECT u FROM Users u WHERE u.address = :address")
+    , @NamedQuery(name = "Users.findByCity", query = "SELECT u FROM Users u WHERE u.city = :city")
+    , @NamedQuery(name = "Users.findByState", query = "SELECT u FROM Users u WHERE u.state = :state")
+    , @NamedQuery(name = "Users.findByCountry", query = "SELECT u FROM Users u WHERE u.country = :country")
+    , @NamedQuery(name = "Users.findByGender", query = "SELECT u FROM Users u WHERE u.gender = :gender")
     , @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email")
+    , @NamedQuery(name = "Users.findByPhone", query = "SELECT u FROM Users u WHERE u.phone = :phone")
     , @NamedQuery(name = "Users.findByUsername", query = "SELECT u FROM Users u WHERE u.username = :username")
     , @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")
-    , @NamedQuery(name = "Users.findByType", query = "SELECT u FROM Users u WHERE u.type = :type")
-    , @NamedQuery(name = "Users.findByImage", query = "SELECT u FROM Users u WHERE u.image = :image")
-    , @NamedQuery(name = "Users.findByContact", query = "SELECT u FROM Users u WHERE u.contact = :contact")
-    , @NamedQuery(name = "Users.findByAddress", query = "SELECT u FROM Users u WHERE u.address = :address")
-    , @NamedQuery(name = "Users.findByGender", query = "SELECT u FROM Users u WHERE u.gender = :gender")
-    , @NamedQuery(name = "Users.findByStatus", query = "SELECT u FROM Users u WHERE u.status = :status")})
+    , @NamedQuery(name = "Users.findByStatus", query = "SELECT u FROM Users u WHERE u.status = :status")
+    , @NamedQuery(name = "Users.findByRole", query = "SELECT u FROM Users u WHERE u.role = :role")
+    , @NamedQuery(name = "Users.findByImage", query = "SELECT u FROM Users u WHERE u.image = :image")})
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -47,34 +52,70 @@ public class Users implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    @Basic(optional = false)
     @Column(name = "fname")
     private String fname;
+    @Basic(optional = false)
     @Column(name = "lname")
     private String lname;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "username")
-    private String username;
-    @Column(name = "password")
-    private String password;
-    @Column(name = "type")
-    private String type;
-    @Column(name = "image")
-    private String image;
-    @Column(name = "contact")
-    private BigInteger contact;
+    @Basic(optional = false)
     @Column(name = "address")
     private String address;
+    @Basic(optional = false)
+    @Column(name = "city")
+    private String city;
+    @Column(name = "state")
+    private String state;
+    @Basic(optional = false)
+    @Column(name = "country")
+    private String country;
     @Column(name = "gender")
     private String gender;
+    @Basic(optional = false)
+    @Column(name = "email")
+    private String email;
+    @Basic(optional = false)
+    @Column(name = "phone")
+    private String phone;
+    @Basic(optional = false)
+    @Column(name = "username")
+    private String username;
+    @Basic(optional = false)
+    @Column(name = "password")
+    private String password;
+    @Basic(optional = false)
     @Column(name = "status")
     private String status;
+    @Basic(optional = false)
+    @Column(name = "role")
+    private String role;
+    @Basic(optional = false)
+    @Column(name = "image")
+    private String image;
+    @OneToMany(mappedBy = "userId")
+    private List<Orders> ordersList;
 
     public Users() {
     }
 
     public Users(Integer id) {
         this.id = id;
+    }
+
+    public Users(Integer id, String fname, String lname, String address, String city, String country, String email, String phone, String username, String password, String status, String role, String image) {
+        this.id = id;
+        this.fname = fname;
+        this.lname = lname;
+        this.address = address;
+        this.city = city;
+        this.country = country;
+        this.email = email;
+        this.phone = phone;
+        this.username = username;
+        this.password = password;
+        this.status = status;
+        this.role = role;
+        this.image = image;
     }
 
     public Integer getId() {
@@ -101,12 +142,60 @@ public class Users implements Serializable {
         this.lname = lname;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getUsername() {
@@ -125,12 +214,20 @@ public class Users implements Serializable {
         this.password = password;
     }
 
-    public String getType() {
-        return type;
+    public String getStatus() {
+        return status;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getImage() {
@@ -141,36 +238,13 @@ public class Users implements Serializable {
         this.image = image;
     }
 
-    public BigInteger getContact() {
-        return contact;
+    @XmlTransient
+    public List<Orders> getOrdersList() {
+        return ordersList;
     }
 
-    public void setContact(BigInteger contact) {
-        this.contact = contact;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOrdersList(List<Orders> ordersList) {
+        this.ordersList = ordersList;
     }
 
     @Override

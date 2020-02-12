@@ -5,6 +5,7 @@
  */
 package edu.kist_bit.hamrotarkaribazzar.utils;
 
+import edu.kist_bit.hamrotarkaribazzar.utils.FileUploadDTO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,7 +29,8 @@ public class FileUploadUtil {
      */
     static final String UPLOAD_DIR = "uploads";
 
-    public static FileUploadDTO fileUpload(HttpServletRequest request, HttpServletResponse response)
+    public static FileUploadDTO fileUpload(HttpServletRequest request, 
+            HttpServletResponse response, String paramName)
             throws ServletException, IOException {
 
         FileUploadDTO fileUploadDto = new FileUploadDTO();
@@ -38,8 +40,16 @@ public class FileUploadUtil {
         
         // Create path components to save the file
         String applicationPath = request.getServletContext().getRealPath("");
+//        System.out.println("applicationPath = "+applicationPath);
+//        String paths[] = applicationPath.split(Pattern.quote(File.separator));
+//        StringBuilder uploadPath = new StringBuilder();
+//        for(int i=0; i<paths.length-2;i++){
+//            uploadPath.append(paths[i]).append(File.separator);
+//            System.out.println(uploadPath);
+//        }
+//        System.out.println("Final upload path = "+uploadPath);
         // constructs path of the directory to save uploaded file
-        String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
+        String uploadFilePath = applicationPath + UPLOAD_DIR;
         
         // creates the save directory if it does not exists
         File fileSaveDir = new File(uploadFilePath);
@@ -47,7 +57,7 @@ public class FileUploadUtil {
             fileSaveDir.mkdirs();
         }
 
-        final Part filePart = request.getPart("photoUpload");
+        final Part filePart = request.getPart(paramName);
         final String fileName = getFileName(filePart);
 
         OutputStream out = null;
@@ -63,7 +73,7 @@ public class FileUploadUtil {
                 out.write(bytes, 0, read);
             }
             fileUploadDto.setIsWrittenOnDisk(Boolean.TRUE);
-            fileUploadDto.setFileLocation(uploadFilePath + File.separator + fileName);
+            fileUploadDto.setFileLocation(UPLOAD_DIR + File.separator + fileName);
         } catch (FileNotFoundException fne) {
         } finally {
             if (out != null) {

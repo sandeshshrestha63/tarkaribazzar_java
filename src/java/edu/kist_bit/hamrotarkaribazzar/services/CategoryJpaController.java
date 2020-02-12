@@ -11,11 +11,10 @@ import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import edu.kist_bit.hamrotarkaribazzar.entity.Subcategory;
+import edu.kist_bit.hamrotarkaribazzar.entity.Product;
+import edu.kist_bit.hamrotarkaribazzar.services.exceptions.NonexistentEntityException;
 import java.util.ArrayList;
 import java.util.List;
-import edu.kist_bit.hamrotarkaribazzar.entity.ConsumableItems;
-import edu.kist_bit.hamrotarkaribazzar.services.exceptions.NonexistentEntityException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -35,45 +34,27 @@ public class CategoryJpaController implements Serializable {
     }
 
     public void create(Category category) {
-        if (category.getSubcategoryList() == null) {
-            category.setSubcategoryList(new ArrayList<Subcategory>());
-        }
-        if (category.getConsumableItemsList() == null) {
-            category.setConsumableItemsList(new ArrayList<ConsumableItems>());
+        if (category.getProductList() == null) {
+            category.setProductList(new ArrayList<Product>());
         }
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            List<Subcategory> attachedSubcategoryList = new ArrayList<Subcategory>();
-            for (Subcategory subcategoryListSubcategoryToAttach : category.getSubcategoryList()) {
-                subcategoryListSubcategoryToAttach = em.getReference(subcategoryListSubcategoryToAttach.getClass(), subcategoryListSubcategoryToAttach.getId());
-                attachedSubcategoryList.add(subcategoryListSubcategoryToAttach);
+            List<Product> attachedProductList = new ArrayList<Product>();
+            for (Product productListProductToAttach : category.getProductList()) {
+                productListProductToAttach = em.getReference(productListProductToAttach.getClass(), productListProductToAttach.getId());
+                attachedProductList.add(productListProductToAttach);
             }
-            category.setSubcategoryList(attachedSubcategoryList);
-            List<ConsumableItems> attachedConsumableItemsList = new ArrayList<ConsumableItems>();
-            for (ConsumableItems consumableItemsListConsumableItemsToAttach : category.getConsumableItemsList()) {
-                consumableItemsListConsumableItemsToAttach = em.getReference(consumableItemsListConsumableItemsToAttach.getClass(), consumableItemsListConsumableItemsToAttach.getId());
-                attachedConsumableItemsList.add(consumableItemsListConsumableItemsToAttach);
-            }
-            category.setConsumableItemsList(attachedConsumableItemsList);
+            category.setProductList(attachedProductList);
             em.persist(category);
-            for (Subcategory subcategoryListSubcategory : category.getSubcategoryList()) {
-                Category oldCategoryIdOfSubcategoryListSubcategory = subcategoryListSubcategory.getCategoryId();
-                subcategoryListSubcategory.setCategoryId(category);
-                subcategoryListSubcategory = em.merge(subcategoryListSubcategory);
-                if (oldCategoryIdOfSubcategoryListSubcategory != null) {
-                    oldCategoryIdOfSubcategoryListSubcategory.getSubcategoryList().remove(subcategoryListSubcategory);
-                    oldCategoryIdOfSubcategoryListSubcategory = em.merge(oldCategoryIdOfSubcategoryListSubcategory);
-                }
-            }
-            for (ConsumableItems consumableItemsListConsumableItems : category.getConsumableItemsList()) {
-                Category oldCatgIdOfConsumableItemsListConsumableItems = consumableItemsListConsumableItems.getCatgId();
-                consumableItemsListConsumableItems.setCatgId(category);
-                consumableItemsListConsumableItems = em.merge(consumableItemsListConsumableItems);
-                if (oldCatgIdOfConsumableItemsListConsumableItems != null) {
-                    oldCatgIdOfConsumableItemsListConsumableItems.getConsumableItemsList().remove(consumableItemsListConsumableItems);
-                    oldCatgIdOfConsumableItemsListConsumableItems = em.merge(oldCatgIdOfConsumableItemsListConsumableItems);
+            for (Product productListProduct : category.getProductList()) {
+                Category oldCategoryIdOfProductListProduct = productListProduct.getCategoryId();
+                productListProduct.setCategoryId(category);
+                productListProduct = em.merge(productListProduct);
+                if (oldCategoryIdOfProductListProduct != null) {
+                    oldCategoryIdOfProductListProduct.getProductList().remove(productListProduct);
+                    oldCategoryIdOfProductListProduct = em.merge(oldCategoryIdOfProductListProduct);
                 }
             }
             em.getTransaction().commit();
@@ -90,56 +71,30 @@ public class CategoryJpaController implements Serializable {
             em = getEntityManager();
             em.getTransaction().begin();
             Category persistentCategory = em.find(Category.class, category.getId());
-            List<Subcategory> subcategoryListOld = persistentCategory.getSubcategoryList();
-            List<Subcategory> subcategoryListNew = category.getSubcategoryList();
-            List<ConsumableItems> consumableItemsListOld = persistentCategory.getConsumableItemsList();
-            List<ConsumableItems> consumableItemsListNew = category.getConsumableItemsList();
-            List<Subcategory> attachedSubcategoryListNew = new ArrayList<Subcategory>();
-            for (Subcategory subcategoryListNewSubcategoryToAttach : subcategoryListNew) {
-                subcategoryListNewSubcategoryToAttach = em.getReference(subcategoryListNewSubcategoryToAttach.getClass(), subcategoryListNewSubcategoryToAttach.getId());
-                attachedSubcategoryListNew.add(subcategoryListNewSubcategoryToAttach);
+            List<Product> productListOld = persistentCategory.getProductList();
+            List<Product> productListNew = category.getProductList();
+            List<Product> attachedProductListNew = new ArrayList<Product>();
+            for (Product productListNewProductToAttach : productListNew) {
+                productListNewProductToAttach = em.getReference(productListNewProductToAttach.getClass(), productListNewProductToAttach.getId());
+                attachedProductListNew.add(productListNewProductToAttach);
             }
-            subcategoryListNew = attachedSubcategoryListNew;
-            category.setSubcategoryList(subcategoryListNew);
-            List<ConsumableItems> attachedConsumableItemsListNew = new ArrayList<ConsumableItems>();
-            for (ConsumableItems consumableItemsListNewConsumableItemsToAttach : consumableItemsListNew) {
-                consumableItemsListNewConsumableItemsToAttach = em.getReference(consumableItemsListNewConsumableItemsToAttach.getClass(), consumableItemsListNewConsumableItemsToAttach.getId());
-                attachedConsumableItemsListNew.add(consumableItemsListNewConsumableItemsToAttach);
-            }
-            consumableItemsListNew = attachedConsumableItemsListNew;
-            category.setConsumableItemsList(consumableItemsListNew);
+            productListNew = attachedProductListNew;
+            category.setProductList(productListNew);
             category = em.merge(category);
-            for (Subcategory subcategoryListOldSubcategory : subcategoryListOld) {
-                if (!subcategoryListNew.contains(subcategoryListOldSubcategory)) {
-                    subcategoryListOldSubcategory.setCategoryId(null);
-                    subcategoryListOldSubcategory = em.merge(subcategoryListOldSubcategory);
+            for (Product productListOldProduct : productListOld) {
+                if (!productListNew.contains(productListOldProduct)) {
+                    productListOldProduct.setCategoryId(null);
+                    productListOldProduct = em.merge(productListOldProduct);
                 }
             }
-            for (Subcategory subcategoryListNewSubcategory : subcategoryListNew) {
-                if (!subcategoryListOld.contains(subcategoryListNewSubcategory)) {
-                    Category oldCategoryIdOfSubcategoryListNewSubcategory = subcategoryListNewSubcategory.getCategoryId();
-                    subcategoryListNewSubcategory.setCategoryId(category);
-                    subcategoryListNewSubcategory = em.merge(subcategoryListNewSubcategory);
-                    if (oldCategoryIdOfSubcategoryListNewSubcategory != null && !oldCategoryIdOfSubcategoryListNewSubcategory.equals(category)) {
-                        oldCategoryIdOfSubcategoryListNewSubcategory.getSubcategoryList().remove(subcategoryListNewSubcategory);
-                        oldCategoryIdOfSubcategoryListNewSubcategory = em.merge(oldCategoryIdOfSubcategoryListNewSubcategory);
-                    }
-                }
-            }
-            for (ConsumableItems consumableItemsListOldConsumableItems : consumableItemsListOld) {
-                if (!consumableItemsListNew.contains(consumableItemsListOldConsumableItems)) {
-                    consumableItemsListOldConsumableItems.setCatgId(null);
-                    consumableItemsListOldConsumableItems = em.merge(consumableItemsListOldConsumableItems);
-                }
-            }
-            for (ConsumableItems consumableItemsListNewConsumableItems : consumableItemsListNew) {
-                if (!consumableItemsListOld.contains(consumableItemsListNewConsumableItems)) {
-                    Category oldCatgIdOfConsumableItemsListNewConsumableItems = consumableItemsListNewConsumableItems.getCatgId();
-                    consumableItemsListNewConsumableItems.setCatgId(category);
-                    consumableItemsListNewConsumableItems = em.merge(consumableItemsListNewConsumableItems);
-                    if (oldCatgIdOfConsumableItemsListNewConsumableItems != null && !oldCatgIdOfConsumableItemsListNewConsumableItems.equals(category)) {
-                        oldCatgIdOfConsumableItemsListNewConsumableItems.getConsumableItemsList().remove(consumableItemsListNewConsumableItems);
-                        oldCatgIdOfConsumableItemsListNewConsumableItems = em.merge(oldCatgIdOfConsumableItemsListNewConsumableItems);
+            for (Product productListNewProduct : productListNew) {
+                if (!productListOld.contains(productListNewProduct)) {
+                    Category oldCategoryIdOfProductListNewProduct = productListNewProduct.getCategoryId();
+                    productListNewProduct.setCategoryId(category);
+                    productListNewProduct = em.merge(productListNewProduct);
+                    if (oldCategoryIdOfProductListNewProduct != null && !oldCategoryIdOfProductListNewProduct.equals(category)) {
+                        oldCategoryIdOfProductListNewProduct.getProductList().remove(productListNewProduct);
+                        oldCategoryIdOfProductListNewProduct = em.merge(oldCategoryIdOfProductListNewProduct);
                     }
                 }
             }
@@ -172,15 +127,10 @@ public class CategoryJpaController implements Serializable {
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The category with id " + id + " no longer exists.", enfe);
             }
-            List<Subcategory> subcategoryList = category.getSubcategoryList();
-            for (Subcategory subcategoryListSubcategory : subcategoryList) {
-                subcategoryListSubcategory.setCategoryId(null);
-                subcategoryListSubcategory = em.merge(subcategoryListSubcategory);
-            }
-            List<ConsumableItems> consumableItemsList = category.getConsumableItemsList();
-            for (ConsumableItems consumableItemsListConsumableItems : consumableItemsList) {
-                consumableItemsListConsumableItems.setCatgId(null);
-                consumableItemsListConsumableItems = em.merge(consumableItemsListConsumableItems);
+            List<Product> productList = category.getProductList();
+            for (Product productListProduct : productList) {
+                productListProduct.setCategoryId(null);
+                productListProduct = em.merge(productListProduct);
             }
             em.remove(category);
             em.getTransaction().commit();
